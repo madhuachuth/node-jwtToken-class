@@ -36,14 +36,13 @@ app.get("/books/", (request, response) => {
   if (authHeader !== undefined) {
     jwtToken = authHeader.split(" ")[1];
   }
+
   if (jwtToken === undefined) {
     response.status(401);
     response.send("Invalid Access Token");
   } else {
     jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, payload) => {
       if (error) {
-        response.send("Invalid Access Token");
-      } else {
         const getBooksQuery = `
             SELECT
               *
@@ -53,6 +52,8 @@ app.get("/books/", (request, response) => {
               book_id;`;
         const booksArray = await db.all(getBooksQuery);
         response.send(booksArray);
+      } else {
+        response.send("Invalid Access Token");
       }
     });
   }
